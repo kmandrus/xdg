@@ -1,0 +1,68 @@
+# Presents a list of commonly visited locations in fzf,
+# then navigates to the selected location
+
+# Automatically includes any git repos, and can include
+# custom locations defined by the user.
+
+# REPO_SEARCH_DIRS is an array that should include all the places to
+# recursively search for git repos. Overwrite the value here with something
+# sensible in an rc file.
+
+zmodload zsh/stat
+
+if ! [[ -n $REPO_SEARCH_DIRS ]]; then
+    REPO_SEARCH_DIRS=( ~/code )
+fi
+SHORTCUTS=$XDG_DATA_HOME/goto_shortcuts
+REPO_CACHE=$XDG_CACHE_HOME/goto_cache
+
+
+cache_repos() {
+    if [[ -f $REPO_CACHE ]]; then
+        rm $REPO_CACHE
+   fi
+    touch $REPO_CACHE
+    for search_dir in "$REPO_SEARCH_DIRS[@]"
+    do 
+        fd_result=( $(fd -H -g '.git' $search_dir) )
+        for result in "${fd_result[@]}" 
+        do
+            repo_path=${result%/.git*}
+            repo_name=${repo_path##*/}
+            echo "$repo_name $repo_path" >> $REPO_CACHE
+        done
+    done 
+}
+
+
+goto() {
+    all_search_files=( $SHORTCUTS $REPO_CACHE )
+
+    # create an associative array of all paths and their nicknames
+    declare -A paths_by_name
+    for file in "$all_search_files[@]"
+    do
+        while read -r line
+        do
+            split=(${(@s[ ])line})
+            location_name=$split[1]; location_path=$split[2]
+            paths_by_name[$location_name]=$location_path
+        done < $file 
+    done
+
+    # present the nicknames to the user for selection
+    selected_name=$(echo ${(k)paths_by_name} | sed 's/ /\n/g' | fzf --height 40% --border)
+    selected_path=$paths_by_name[$selected_name]
+    selected_path="${selected_path/#\~/$HOME}" # expand any ~ in the path
+    
+    # navigate to the path, if one was selected
+    if ! [ -z $selected_path ] 
+    then
+        cd $selected_path
+    fi
+    # run this in the background after goto finishes to avoid overwriting the cache while it's in use 
+    cache_repos $REPO_CACHE $REPO_SEARCH_DIRS &!
+}
+
+goto
+
