@@ -10,11 +10,13 @@
 
 zmodload zsh/stat
 
+# add defaults if XDG directories are unset
+
 if ! [[ -n $REPO_SEARCH_DIRS ]]; then
-    REPO_SEARCH_DIRS=( ~/code )
+    REPO_SEARCH_DIRS=( $HOME/code )
 fi
 SHORTCUTS=$XDG_DATA_HOME/goto_shortcuts
-REPO_CACHE=$XDG_CACHE_HOME/goto_cache
+REPO_CACHE=$XDG_STATE_HOME/goto_cache
 
 
 cache_repos() {
