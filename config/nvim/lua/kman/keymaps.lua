@@ -94,7 +94,7 @@ keymap("v", "<leader>}", "<esc>`>a}<esc>`<i{<esc>lel", opts)
 keymap("n", "<leader>s", ":luafile %<cr>", opts)
 
 -- Clear highlights
-keymap("n", "<leader>h", "<cmd>nohlsearch<CR>", opts)
+keymap("n", "<leader>c", "<cmd>nohlsearch<CR>", opts)
 
 -- Don't replace what's in the " register when pasting in visual mode
 keymap("v", "p", '"_dP', opts)
