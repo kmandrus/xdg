@@ -42,6 +42,10 @@ keymap("n", "<Right>", ":vertical resize +2<CR>", opts)
 keymap("n", "}", ":bnext<CR>", opts)
 keymap("n", "{", ":bprevious<CR>", opts)
 
+-- Open buffers
+keymap("n", "<leader>h", ":split<CR>", opts)
+keymap("n", "<leader>v", ":vsplit<CR>", opts)
+
 -- Movement 
 keymap("n", "H", "^", opts)
 keymap("n", "L", "$", opts)
