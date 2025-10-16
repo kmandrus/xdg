@@ -6,9 +6,8 @@ end
 
 configs.setup({
     ensure_installed = "all", -- one of "all" or a list of languages
-    ignore_install = { "ipkg" }, -- List of parsers to ignore installing
+    ignore_install = { "" }, -- List of parsers to ignore installing
     sync_install = false,
-    auto_install = true,
     highlight = {
         enable = true, -- false will disable the whole extension
         disable = { "" }, -- list of language that will be disabled

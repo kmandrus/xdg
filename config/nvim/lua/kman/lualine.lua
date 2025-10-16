@@ -47,5 +47,4 @@ lualine.setup {
   tabline = {},
   winbar = {},
   inactive_winbar = {},
-  extensions = { 'nerdtree' }
 }

@@ -33,6 +33,7 @@ telescope.setup{
   },
   pickers = {
     find_files = { theme = "ivy" },
+    builtin = { theme = "ivy" },
     live_grep = { theme = "ivy" },
     grep_string = { theme = "ivy" },
     buffers = { theme = "ivy" },
