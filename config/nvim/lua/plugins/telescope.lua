@@ -20,6 +20,7 @@ return {
       vim.keymap.set("n", "<leader>fm", t.marks, opts)
       vim.keymap.set("n", "<leader>fr", t.registers, opts)
       vim.keymap.set("n", "<leader>fl", t.resume, opts)
+      vim.keymap.set("n", "<leader>fp", t.builtin, opts)
       vim.keymap.set("n", "<leader>gc", t.git_commits, opts)
       vim.keymap.set("n", "<leader>gC", t.git_bcommits, opts)
       vim.keymap.set("n", "<leader>gb", t.git_branches, opts)

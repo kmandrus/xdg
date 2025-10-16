@@ -123,3 +123,4 @@ return {
     gitbrowse = { enabled = true},
   },
 }
+

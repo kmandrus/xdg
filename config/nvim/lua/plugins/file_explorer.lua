@@ -1,6 +1,5 @@
 return {
-  { "preservim/nerdtree" },
-    {
+  {
     'stevearc/oil.nvim',
     ---@module 'oil'
     ---@type oil.SetupOpts
