@@ -49,3 +49,6 @@ vim.opt.whichwrap:append("<,>,[,],h,l")
 vim.opt.iskeyword:append("-")
 vim.opt.filetype = 'on'
 -- vim.opt.winborder = 'solid'
+
+-- snacks
+-- vim.g.snacks_animate = false
