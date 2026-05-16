@@ -4,26 +4,32 @@
 # Automatically includes any git repos, and can include
 # custom locations defined by the user.
 
-# REPO_SEARCH_DIRS is an array that should include all the places to
-# recursively search for git repos. Overwrite the value here with something
-# sensible in an rc file.
+# the format of the shortcut and repo cache files is:
+# <nickname> <path>
+# With one entry per line.
 
 zmodload zsh/stat
 
-# add defaults if XDG directories are unset
-
+# REPO_SEARCH_DIRS is an array that should include all the places to
+# recursively search for git repos. Feel free to overwrite the default.
 if ! [[ -n $REPO_SEARCH_DIRS ]]; then
     REPO_SEARCH_DIRS=( $HOME/code )
 fi
-SHORTCUTS=$XDG_DATA_HOME/goto_shortcuts
+# SHORTCUTS is an user-defined shortcuts file
+if ! [[ -n $SHORTCUTS ]]; then
+    SHORTCUTS=$XDG_DATA_HOME/goto_shortcuts
+    touch $SHORTCUTS
+fi
 REPO_CACHE=$XDG_STATE_HOME/goto_cache
 
 
 cache_repos() {
+    # clear the existing cache
     if [[ -f $REPO_CACHE ]]; then
         rm $REPO_CACHE
    fi
     touch $REPO_CACHE
+    # search for git repos recursively in the specified directories
     for search_dir in "$REPO_SEARCH_DIRS[@]"
     do 
         fd_result=( $(fd -H -g '.git' $search_dir) )
