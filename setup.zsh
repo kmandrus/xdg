@@ -9,3 +9,6 @@ fi
 # symlink nvim config in this directory to $XDG_CONFIG_HOME/nvim
 ln -s config/nvim $XDG_CONFIG_HOME/nvim
 
+# symlink zsh config in this directory to $XDG_CONFIG_HOME/zsh
+ln -s config/zsh $XDG_CONFIG_HOME/zsh
+

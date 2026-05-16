@@ -6,9 +6,17 @@
 
 # the format of the shortcut and repo cache files is:
 # <nickname> <path>
-# With one entry per line.
+# With one entry per line. The nickname is what will be shown in fzf, 
+# and the path is where goto will navigate to when that nickname is selected.
 
 zmodload zsh/stat
+
+# Ensure needed XDG Setup is complete
+if [[ -z $XDG_CONFIG_HOME ]]; then
+    print -u2 "goto: XDG_CONFIG_HOME is not set."
+    return 1
+fi
+
 
 # REPO_SEARCH_DIRS is an array that should include all the places to
 # recursively search for git repos. Feel free to overwrite the default.
@@ -17,8 +25,8 @@ if ! [[ -n $REPO_SEARCH_DIRS ]]; then
 fi
 # SHORTCUTS is an user-defined shortcuts file
 if ! [[ -n $SHORTCUTS ]]; then
-    SHORTCUTS=$XDG_DATA_HOME/goto_shortcuts
-    touch $SHORTCUTS
+    SHORTCUTS=$XDG_CONFIG_HOME/goto_shortcuts
+    echo "home $HOME" > $SHORTCUTS
 fi
 REPO_CACHE=$XDG_STATE_HOME/goto_cache
 
