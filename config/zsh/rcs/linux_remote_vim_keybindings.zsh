@@ -10,4 +10,4 @@ fi
 # put and yank using the system clipboard
 alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
-source $XDG_CONFIG_HOME/zsh/vim_keybindings.zsh
+source $XDG_CONFIG_HOME/zsh/rcs/vim_keybindings.zsh
