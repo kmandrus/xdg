@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+
+import sys
+
+seen_lines = set()
+
+for line in sys.stdin:
+    if line not in seen_lines:
+        seen_lines.add(line)
+        sys.stdout.write(line) 

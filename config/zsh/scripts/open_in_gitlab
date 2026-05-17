@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+
+
+import sys
+import webbrowser
+from pathlib import Path
+
+
+"""
+Takes an absolute path to a file or directory in a repository and opens it in gitlab.
+
+Accepts an absolute path to a file or directory in the repository.
+Assumes all repositories on a system are stored in '~/code'.
+"""
+
+FLATIRONHEALTH = "flatironhealth"
+LHP = "lhp"
+CG = "clinicalgenomics"
+IAM = "iam"
+LINKING = "rwe/linkingprojects"
+DATA_PLATFORMS = "data-platforms"
+
+GITLAB_FORMAT_STR = "https://git.the.flatiron.com/{repo_owner}/{repo_name}/-/{path_type}/{branch}/{path}"
+CONFIG_BY_REPO = {
+    "flatiron": {"owner": FLATIRONHEALTH, "branch": "master"},
+    "rwe-config": {"owner": FLATIRONHEALTH, "branch": "master"}, 
+    "wario-workflows": {"owner": LHP, "branch": "master"},
+    "cg-infrastructure": {"owner": CG, "branch": "master"},
+    "aws-iam": {"owner": IAM, "branch": "master"}, 
+    "flexible-tokenization-service": {"owner": LINKING, "branch": "main"},
+    "vault": {"owner": IAM, "branch": "master"},
+    "snowflake": {"owner": DATA_PLATFORMS, "branch": "master"},
+    "dotfiles": {"owner": "kevin.andrus", "branch": "main"},
+    "scans-service": {"owner": LHP, "branch": "master"},
+}
+
+
+def validate_path(local_path: Path) -> None:
+    assert local_path.is_absolute()
+    assert "code" in local_path.parts
+
+
+def to_repo_root(path: Path) -> Path:
+    return path.relative_to(Path.home() / "code") 
+
+
+def main(local_path):
+    repo_name = to_repo_root(local_path).parts[0]
+    config = CONFIG_BY_REPO[repo_name]
+    relative_path = str(to_repo_root(local_path).relative_to(repo_name))
+    path_type = "tree" if local_path.is_dir() else "blob"
+
+    webbrowser.open(
+        GITLAB_FORMAT_STR.format(
+            repo_owner = config["owner"],
+            repo_name = repo_name,
+            path_type = path_type,
+            branch = config["branch"],
+            path = relative_path,
+        )
+    )
+
+
+if __name__ == "__main__":
+    local_path = Path(sys.argv[1])
+    main(local_path)
