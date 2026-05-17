@@ -40,7 +40,7 @@ add_to_fpath() {
     fi
 }
 
-load_scripts ${$ZSH_CONFIG_DIR}/scripts
+load_scripts ${ZSH_CONFIG_DIR}/scripts/
 add_to_fpath ${ZSH_CONFIG_DIR}/functions/
 autoload -Uz goto
 
