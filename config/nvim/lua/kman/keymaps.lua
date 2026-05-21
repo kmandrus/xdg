@@ -63,8 +63,8 @@ keymap("o", "<C-d>", "<C-d>zz", opts)
 keymap("o", "<C-u>", "<C-u>zz", opts)
 
 -- Quickfix Menu
-keymap("n", "<)>", ":cnext<CR>", opts)
-keymap("n", "<(>", ":cprevious<CR>", opts)
+keymap("n", ")", ":cnext<CR>", opts)
+keymap("n", "(", ":cprevious<CR>", opts)
 
 -- uppercase a word in normal and insert mode
 keymap("i", "<c-u>", "<esc>viwUea", opts)
@@ -117,7 +117,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     buf_keymap(buf, "n", "gk", "<cmd>lua vim.lsp.buf.hover({border = 'rounded'})<CR>", opts)
     buf_keymap(buf, "n", "gK", "<cmd>vsplit | lua vim.lsp.buf.definition()<CR>", opts)
     buf_keymap(buf, "n", "gI", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-    -- buf_keymap(buf, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+    buf_keymap(buf, "n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
     buf_keymap(buf, "n", "gl", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
     buf_keymap(buf, "n", "<leader>lf", "<cmd>lua vim.lsp.buf.formatting()<cr>", opts)
     buf_keymap(buf, "n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<cr>", opts)
