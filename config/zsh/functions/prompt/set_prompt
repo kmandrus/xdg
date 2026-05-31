@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Top-level script to source for a custom prompt
-add_to_fpath $DOTFILES/functions/prompt
+add_to_fpath $XDG_CONFIG_HOME/zsh/functions/prompt
 autoload -Uz get_prompt_branch get_prompt_path get_repo_prompt_path is_git_repo get_venv_info 
 
 
