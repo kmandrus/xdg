@@ -1,0 +1,19 @@
+#!/bin/zsh
+
+# Top-level script to source for a custom prompt
+add_to_fpath $DOTFILES/functions/prompt
+autoload -Uz get_prompt_branch get_prompt_path get_repo_prompt_path is_git_repo get_venv_info 
+
+
+local end="%F{green}%#%{$reset_color%} "
+local venv="%F{green}$(get_venv_info)%{$reset_color%}"
+local exit_status="%(?.%F{green}.%F{red})[%?]%{$reset_color%}"
+if [[ $(is_git_repo) == true ]]; then
+    local branch="%F{green}{ $(get_prompt_branch) }%{$reset_color%}"
+    local prompt_path="%F{blue}$(get_repo_prompt_path)%{$reset_color%}"
+    export RPROMPT="${branch} ${exit_status}"
+else
+    local prompt_path="%F{blue}$(get_prompt_path)%{$reset_color%}"
+    export RPROMPT="${exit_status}"
+fi
+export PROMPT="${venv}${prompt_path} $end"

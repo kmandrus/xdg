@@ -1,0 +1,11 @@
+#!/bin/zsh
+
+add_to_fpath $DOTFILES/functions/prompt/
+autoload -Uz compress_path
+
+# root at the repo name and compress the path 
+# Currently only setup for git repos
+local repo_path=$(git rev-parse --show-toplevel)
+local repo_name=$(basename $repo_path)
+local remaining_path=${PWD/$repo_path/}
+echo $(compress_path "${repo_name}${remaining_path}")

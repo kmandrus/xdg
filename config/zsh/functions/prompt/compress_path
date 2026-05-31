@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+local base_path=$1
+local final_path=$base_path
+local parts=(${(s|/|)base_path})
+if [[ ${#parts} -gt 3 ]]; then
+    local root=${(M)base_path#*/}
+    if [[ ${root} == / ]]; then
+        root=${(M)base_path#/*/}
+    fi
+    local final_dirs=${(M)base_path%/*/*}
+    local middle=${base_path#$root}
+    middle=${middle%$final_dirs}
+    final_path="${root}${middle//[^\/]/}${final_dirs}"
+fi
+echo $final_path

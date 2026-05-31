@@ -1,0 +1,18 @@
+#!/bin/zsh
+
+add_to_fpath $DOTFILES/functions/prompt/
+autoload -Uz compress_path
+
+# Generates a "compressed" path when below $HOME, and the full path above home.
+# "Compressed" paths only show the final two directories, and also compresses home to ~.
+# When above home, no compression of any kind occurs.
+# Examples:
+#   /Users/kevin.andrus/Documents/Notes -> ~/Documents/Notes
+#   /Users/kevin.andrus/Documents/Notes/Woodworking/Tables -> ~///Woodworking/Tables
+#   /System/Library/Graphics -> /System/Library/Graphics
+local base_path=${PWD/$HOME/\~}
+local final_path=$base_path
+if [[ $(pwd) =~ ^$HOME ]]; then # compress the path, if needed, below home
+    final_path=$(compress_path $base_path)
+fi
+echo $final_path

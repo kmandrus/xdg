@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+
+local branch=$(git rev-parse --abbrev-ref HEAD) 
+if [[ $COMPRESS_PROMPT_BRANCH == "TRUE" ]]; then
+    if [[ -z $PROMPT_BRANCH_CHAR_LIMIT ]]; then PROMPT_BRANCH_CHAR_LIMIT=20 fi;
+    # if the branch length is > the char limit, chop off the user, if present.
+    if [[ ${#branch} > $PROMPT_BRANCH_CHAR_LIMIT ]]; then 
+        branch=${branch#$USER/}
+    fi
+    # If the branch length is still > x, replace the middle with an ellipsis
+    if [[ ${#branch} > $PROMPT_BRANCH_CHAR_LIMIT ]]; then 
+        branch="${branch:0:5}...${branch: -12}"
+    fi
+fi
+echo $branch
