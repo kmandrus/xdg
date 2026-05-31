@@ -160,4 +160,8 @@ alias caffeinate="caffeinate -isd"
 # EDITOR
 export EDITOR=nvim
 
+# Poetry
+alias penv='eval $(poetry env activate)' # activate poetry v2 virtual env
+
+# setput the zsh-syntax-highlighting plugin
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
