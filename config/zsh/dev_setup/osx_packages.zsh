@@ -7,6 +7,8 @@ brew install neovim
 brew install zsh-syntax-highlighting
 brew install spaceship
 brew install ipython
+brew install tree-sitter
+brew install tree-sitter-cli
 pip install csvkit
 pip install black
 
