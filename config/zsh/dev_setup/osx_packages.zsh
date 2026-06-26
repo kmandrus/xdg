@@ -9,3 +9,7 @@ brew install spaceship
 brew install ipython
 pip install csvkit
 pip install black
+
+# fonts
+brew tap homebrew/cask-fonts
+brew install --cask font-jetbrains-mono-nerd-font
