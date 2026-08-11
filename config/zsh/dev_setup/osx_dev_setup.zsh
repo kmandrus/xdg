@@ -3,3 +3,4 @@ SETUP_SCRIPTS=$XDG_CONFIG_HOME/zsh/dev_setup
 
 source $SETUP_SCRIPTS/osx_packages.zsh
 source $SETUP_SCRIPTS/configure_git.zsh
+source $SETUP_SCRIPTS/symlink_config.zsh

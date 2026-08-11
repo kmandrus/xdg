@@ -1,0 +1,11 @@
+c.InteractiveShell.automagic = True
+c.TerminalInteractiveShell.automagic = True
+c.TerminalInteractiveShell.confirm_exit = False
+c.TerminalInteractiveShell.editing_mode = 'vi'
+c.TerminalInteractiveShell.editor = 'nvim'
+c.TerminalInteractiveShell.extra_open_editor_shortcuts = False
+c.TerminalInteractiveShell.highlight_matching_brackets = True
+c.TerminalInteractiveShell.pdb = False
+c.TerminalInteractiveShell.prompt_includes_vi_mode = True
+c.TerminalInteractiveShell.space_for_menu = 6
+c.TerminalInteractiveShell.true_color = True

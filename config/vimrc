@@ -1,0 +1,153 @@
+" A Basic Vimrc for when Neovim is unavailable
+
+" Settings and Options {{{
+syntax on           " Turn on syntax highlighting.
+set clipboard=unnamedplus
+set shortmess+=I    " Disable the default Vim startup message.
+set number          " Show line numbers.
+set relativenumber  " enables relative line numbering 
+set backspace=indent,eol,start  " backspace over anything.
+set hidden          "allow hidden unsaved buffers
+set ignorecase      " case-insensitive search 
+set smartcase       " case-sensitive search with capital letters
+set incsearch       " begin search while typing
+set foldlevelstart=0 "start with all folds closed
+set hls             " enable highlighting
+set mouse+=a        " enable mouse support
+nmap Q <Nop>        " unbind Q in normal mode
+set noerrorbells visualbell t_vb= " disable bell
+" }}}
+
+
+" Tab and Indent Settings {{{
+set tabstop=8 softtabstop=4 shiftwidth=4 
+set expandtab smartindent smarttab
+" }}}
+
+
+" Statusline {{{
+set laststatus=2    " Always show the status line 
+set statusline=%f%=%r[%l/%L]
+" }}}
+
+
+" Leader Keys {{{
+let mapleader = " "
+let maplocalleader = "\<return>"
+" }}}
+
+
+" Movement {{{
+nnoremap { }
+nnoremap } {
+vnoremap { }
+vnoremap } {
+onoremap { }
+onoremap } {
+" }}}
+
+
+" Quick navigation between panes. {{{
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+inoremap <C-h> <C-w>h
+inoremap <C-l> <C-w>l
+inoremap <C-j> <C-w>j
+inoremap <C-k> <C-w>k
+" }}}
+
+" Navigate Buffers {{{
+noremap ] :bnext<cr>
+noremap [ :bprevious<cr>
+" }}}
+
+" Quickfix Menus {{{
+nnoremap ) :cnext
+nnoremap ( :cprevious
+" }}}
+
+" Other Mappings {{{
+" uppercase word while in insert mode
+inoremap <c-u> <esc>viwUea
+" uppercase word while in normal mode
+nnoremap <leader>u viwUe
+" quote a word
+nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
+nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
+" surroud a visual mode selection
+vnoremap <leader>" <esc>`>a"<esc>`<i"<esc>lel
+vnoremap <leader>' <esc>`>a'<esc>`<i'<esc>lel
+vnoremap <leader>[ <esc>`>a]<esc>`<i[<esc>lel
+vnoremap <leader>] <esc>`>a]<esc>`<i[<esc>lel
+vnoremap <leader>( <esc>`>a)<esc>`<i(<esc>lel
+vnoremap <leader>) <esc>`>a)<esc>`<i(<esc>lel
+vnoremap <leader>{ <esc>`>a}<esc>`<i{<esc>lel
+vnoremap <leader>} <esc>`>a}<esc>`<i{<esc>lel
+" 'in' and 'around' next and last parenthesis
+onoremap in( :<c-u>normal! f(vi(<cr>
+onoremap il( :<c-u>normal! F(vi(<cr> 
+onoremap an( :<c-u>normal! f(va(<cr>
+onoremap al( :<c-u>normal! F(va(<cr> 
+" }}}
+
+
+" Quickly edit and source vimrc {{{
+noremap <leader>e :vsplit $MYVIMRC<cr>
+noremap <leader>s :source $MYVIMRC<cr>
+" }}}
+
+
+" ZSH file settings {{{
+augroup filetype_zsh
+    autocmd!
+    " set filetype to zsh if it contains 'rcs' in the path
+    autocmd BufNewFile,BufEnter */rcs/* :set filetype=zsh
+    " comments
+    autocmd FileType zsh,bash nnoremap <buffer> <localleader>c I# <esc>
+    autocmd FileType zsh,bash nnoremap <buffer> <localleader>uc ^dw
+augroup end
+" }}}
+
+
+" Python file settings {{{
+augroup filetype_python
+    autocmd!
+    " comments
+    autocmd FileType python nnoremap <buffer> <localleader>c I# <esc>
+    autocmd FileType python nnoremap <buffer> <localleader>uc ^dw
+augroup end
+" }}}
+
+
+" SQL file settings {{{
+augroup filetype_sql
+    autocmd!
+    " short tabs
+    autocmd FileType sql set shiftwidth=2 softtabstop=2
+    " comments
+    autocmd FileType sql nnoremap <buffer> <localleader>" I-- <esc>
+    autocmd FileType sql nnoremap <buffer> <localleader>uc ^dw
+augroup end
+" }}}
+
+
+" Vimscript file settings {{{
+augroup filetype_vim
+    autocmd!
+    " code folding
+    autocmd FileType vim setlocal foldmethod=marker
+    " comment and uncomment
+    autocmd FileType vim nnoremap <buffer> <localleader>" I" <esc>
+    autocmd FileType vim nnoremap <buffer> <localleader>uc ^dw
+augroup end
+" }}}
+
+
+" Completion {{{
+filetype plugin on
+set omnifunc=syntaxcomplete#Complete
+set completeopt=longest,menuone
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" }}}

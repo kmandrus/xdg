@@ -1,0 +1,12 @@
+set bell-style none
+set colored-stats On
+set show-all-if-ambiguous On
+set show-all-if-unmodified On
+set completion-ignore-case on
+
+set editing-mode vi
+set show-mode-in-prompt on 
+set keymap vi-command
+"L": beginning-of-line
+"H": end-of-line
+set keymap vi-insert

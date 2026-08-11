@@ -1,5 +1,7 @@
 # Install Packages
 brew install iterm2
+# symlink iterm2 settings
+ln -s $XDG_CONFIG_HOME/iterm2_settings $HOME/Library/Preferences/com.googlecode.iterm2.plist 
 brew install fzf
 brew install fd
 ln -s $(which fdfind) ~/.local/bin/fd # add symlink for fd
