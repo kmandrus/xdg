@@ -26,7 +26,9 @@ fi
 # SHORTCUTS is an user-defined shortcuts file
 if ! [[ -n $SHORTCUTS ]]; then
     SHORTCUTS=$XDG_CONFIG_HOME/goto_shortcuts
-    echo "home $HOME" > $SHORTCUTS
+    if ! [[ $SHORTCUTS ]]; then
+        echo "home $HOME" > $SHORTCUTS
+    fi
 fi
 REPO_CACHE=$XDG_STATE_HOME/goto_cache
 
