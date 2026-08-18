@@ -165,3 +165,7 @@ alias penv='eval $(poetry env activate)' # activate poetry v2 virtual env
 
 # setput the zsh-syntax-highlighting plugin
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# uv
+alias uv-env="source .venv/bin/activate"
+alias uv-ipython="uv run --with ipython ipython"
