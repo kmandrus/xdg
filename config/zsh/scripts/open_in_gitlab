@@ -19,6 +19,7 @@ CG = "clinicalgenomics"
 IAM = "iam"
 LINKING = "rwe/linkingprojects"
 DATA_PLATFORMS = "data-platforms"
+BLOOM = "rwe/bloom"
 
 GITLAB_FORMAT_STR = "https://git.the.flatiron.com/{repo_owner}/{repo_name}/-/{path_type}/{branch}/{path}"
 CONFIG_BY_REPO = {
@@ -32,6 +33,8 @@ CONFIG_BY_REPO = {
     "snowflake": {"owner": DATA_PLATFORMS, "branch": "master"},
     "dotfiles": {"owner": "kevin.andrus", "branch": "main"},
     "scans-service": {"owner": LHP, "branch": "master"},
+    "fh-auth-infra": {"owner": BLOOM, "branch": "master"},
+    "fh-auth": {"owner": BLOOM, "branch": "master"},
 }
 
 
