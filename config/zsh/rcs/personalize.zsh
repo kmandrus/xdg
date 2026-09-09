@@ -140,7 +140,11 @@ cb() {
     git checkout $(git branch | fzf ${FZF_OPTIONS} ) 
 }
 gn() {
-    git checkout -b $USER/$1
+    local prefix=$USER
+    if [[ $prefix == "coder" ]]; then
+        prefix="kevin.andrus"
+    fi
+    git checkout -b $prefix/$1
 }
 
 
