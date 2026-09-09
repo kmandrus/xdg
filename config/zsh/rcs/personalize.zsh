@@ -122,19 +122,23 @@ alias gb="git branch"
 alias ga="git add . && git status"
 alias gc="git commit -m"
 alias gd="git diff"
-gitmaster() {
+gitup() {
     git fetch --no-tags --prune || return
-    if [ "$(git symbolic-ref --short HEAD 2>/dev/null)" != "master" ]; then
-        git fetch --no-tags . origin/master:master || return
+    local default_branch
+    if git show-ref --verify --quiet refs/remotes/origin/main; then
+        default_branch=main
+    elif git show-ref --verify --quiet refs/remotes/origin/master; then
+        default_branch=master
+    else
+        print -u2 "gitup: no origin/main or origin/master found"
+        return 1
     fi
-    git rebase origin/master
-}
-gitmain() {
-    git fetch --no-tags --prune || return
-    if [ "$(git symbolic-ref --short HEAD 2>/dev/null)" != "main" ]; then
-        git fetch --no-tags . origin/main:main || return
+    # fast-forward local main/master if we aren't on it
+    if [ "$(git branch --show-current)" != "$default_branch" ]; then
+        git fetch --no-tags . origin/$default_branch:$default_branch || return
     fi
-    git rebase origin/main
+    # rebase, passing through flags
+    git rebase "$@" origin/$default_branch
 }
 cb() { 
     git checkout $(git branch | fzf ${FZF_OPTIONS} ) 
