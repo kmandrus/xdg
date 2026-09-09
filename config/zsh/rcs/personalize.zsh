@@ -102,22 +102,6 @@ autoload edit-command-line
 zle -N edit-command-line
 bindkey '^e' edit-command-line
 
-fzf-run-widget() {
-    # load associative array of commands by nickname
-    source ${XDG_CONFIG_HOME}/run_shortcuts
-
-    # present the nicknames to the user for selection
-    selected_nickname=$(echo ${(k)CMDS_BY_NICKNAME} | sed 's/ /\n/g' | fzf --height 40% --border)
-    selected_cmd=$CMDS_BY_NICKNAME[$selected_nickname]
-
-    # run the command
-    zle push-line 
-    BUFFER=$selected_cmd
-    zle accept-line
-}
-zle -N fzf-run-widget
-bindkey -M vicmd '^h' fzf-run-widget
-bindkey -M viins '^h' fzf-run-widget
 
 # OPTIONS
 # Turn off beeps
@@ -138,8 +122,20 @@ alias gb="git branch"
 alias ga="git add . && git status"
 alias gc="git commit -m"
 alias gd="git diff"
-alias gitmaster="git fetch --no-tags && git rebase origin/master"
-alias gitmain="git fetch --no-tags && git rebase origin/main"
+gitmaster() {
+    git fetch --no-tags --prune || return
+    if [ "$(git symbolic-ref --short HEAD 2>/dev/null)" != "master" ]; then
+        git fetch --no-tags . origin/master:master || return
+    fi
+    git rebase origin/master
+}
+gitmain() {
+    git fetch --no-tags --prune || return
+    if [ "$(git symbolic-ref --short HEAD 2>/dev/null)" != "main" ]; then
+        git fetch --no-tags . origin/main:main || return
+    fi
+    git rebase origin/main
+}
 cb() { 
     git checkout $(git branch | fzf ${FZF_OPTIONS} ) 
 }
@@ -169,3 +165,6 @@ source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # uv
 alias uv-env="source .venv/bin/activate"
 alias uv-ipython="uv run --with ipython ipython"
+
+# Q - Querying CSVs
+alias q='q -O -b -H -d ","'
