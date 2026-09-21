@@ -1,0 +1,2 @@
+declare -A CMDS_BY_NICKNAME
+CMDS_BY_NICKNAME[hello_world]='echo Hello, World!'

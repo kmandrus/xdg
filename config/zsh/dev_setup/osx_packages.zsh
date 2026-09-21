@@ -11,6 +11,7 @@ brew install spaceship
 brew install ipython
 brew install tree-sitter
 brew install tree-sitter-cli
+brew install csvtomd
 pip install csvkit
 pip install black
 
