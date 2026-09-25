@@ -1,0 +1,181 @@
+#!/usr/bin/env bash
+# ts-install: build tree-sitter parsers as x86_64 dylibs without invoking
+# x86_64 xcrun. Works around CommandLineTools 27 shipping libxcrun.dylib as
+# arm64-only, which breaks the tree-sitter-cli build path used by
+# `:TSInstall` on this x86_64-under-Rosetta box.
+#
+# Strategy: cross-compile with Apple's universal /usr/bin/clang under
+# `arch -arm64` (where xcrun works), targeting `-arch x86_64` so the .so is
+# loadable by our x86_64 Homebrew nvim. Queries are copied out of the
+# nvim-treesitter plugin's own runtime/queries/ tree.
+#
+# Reads parser url/revision/location from the plugin's parsers.lua at
+# runtime, so it stays in sync with whatever nvim-treesitter version lazy
+# has checked out.
+#
+# Usage:
+#   ts-install                       # install the default set
+#   ts-install yaml lua python       # install just these
+#   ts-install --force               # rebuild everything
+#   ts-install --list                # print the default set
+
+set -euo pipefail
+
+PLUGIN_DIR="${HOME}/.local/share/nvim/lazy/nvim-treesitter"
+PARSERS_LUA="${PLUGIN_DIR}/lua/nvim-treesitter/parsers.lua"
+QUERIES_SRC="${PLUGIN_DIR}/runtime/queries"
+SITE="${HOME}/.local/share/nvim/site"
+
+DEFAULT_LANGS=(
+  bash c cpp css diff dockerfile
+  git_config git_rebase gitattributes gitcommit gitignore
+  go html javascript json lua luadoc luap
+  make markdown markdown_inline
+  python query regex rst ruby rust
+  sql terraform toml tsx typescript
+  vim vimdoc yaml
+)
+
+usage() {
+  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+  exit "${1:-0}"
+}
+
+FORCE=0
+LIST_ONLY=0
+LANGS=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -f|--force) FORCE=1 ;;
+    -l|--list)  LIST_ONLY=1 ;;
+    -h|--help)  usage 0 ;;
+    -*)         echo "unknown flag: $1" >&2; usage 1 ;;
+    *)          LANGS+=("$1") ;;
+  esac
+  shift
+done
+
+if [[ $LIST_ONLY -eq 1 ]]; then
+  printf '%s\n' "${DEFAULT_LANGS[@]}"
+  exit 0
+fi
+
+if [[ ${#LANGS[@]} -eq 0 ]]; then
+  LANGS=("${DEFAULT_LANGS[@]}")
+fi
+
+if [[ ! -f "$PARSERS_LUA" ]]; then
+  echo "error: parsers.lua not found at $PARSERS_LUA" >&2
+  echo "  is nvim-treesitter installed via lazy? open nvim, run :Lazy sync, then retry." >&2
+  exit 1
+fi
+
+mkdir -p "$SITE/parser" "$SITE/queries"
+
+# Cleanup any temp checkouts on exit / signal.
+declare -a TMPDIRS=()
+cleanup() { [[ ${#TMPDIRS[@]} -gt 0 ]] && rm -rf "${TMPDIRS[@]}"; }
+trap cleanup EXIT
+
+# Look up install_info from parsers.lua. Prints "<url>\t<revision>\t<location>".
+lookup_parser() {
+  local lang="$1"
+  nvim --headless --clean -l /dev/stdin "$PARSERS_LUA" "$lang" <<'LUA'
+local path, lang = arg[1], arg[2]
+local t = dofile(path)
+local info = t[lang]
+if not info then io.stderr:write("no such lang in parsers.lua: " .. lang .. "\n") os.exit(1) end
+local i = info.install_info or {}
+io.write((i.url or "") .. "\t" .. (i.revision or "") .. "\t" .. (i.location or "") .. "\n")
+LUA
+}
+
+build_one() {
+  local lang="$1"
+  local so="$SITE/parser/$lang.so"
+
+  if [[ $FORCE -eq 0 && -f "$so" ]]; then
+    echo "  ✔ $lang (already installed)"
+    return 0
+  fi
+
+  local info url revision location
+  if ! info=$(lookup_parser "$lang"); then
+    echo "  ✗ $lang (not in parsers.lua)" >&2
+    return 1
+  fi
+  url=$(  printf '%s' "$info" | cut -f1)
+  revision=$(printf '%s' "$info" | cut -f2)
+  location=$( printf '%s' "$info" | cut -f3)
+
+  if [[ -z "$url" ]]; then
+    echo "  ✗ $lang (no url)" >&2
+    return 1
+  fi
+
+  local tmp
+  tmp=$(mktemp -d)
+  TMPDIRS+=("$tmp")
+
+  git init -q "$tmp/repo"
+  git -C "$tmp/repo" remote add origin "$url"
+  if [[ -n "$revision" ]]; then
+    if ! git -C "$tmp/repo" fetch -q --depth=1 origin "$revision" 2>/dev/null; then
+      # GitHub allows depth=1 for SHAs, but not always for tags/branches.
+      git -C "$tmp/repo" fetch -q origin "$revision" 2>/dev/null \
+        || git -C "$tmp/repo" fetch -q origin
+    fi
+    git -C "$tmp/repo" checkout -q FETCH_HEAD 2>/dev/null \
+      || git -C "$tmp/repo" checkout -q "$revision"
+  else
+    git -C "$tmp/repo" fetch -q --depth=1 origin HEAD
+    git -C "$tmp/repo" checkout -q FETCH_HEAD
+  fi
+
+  local src="$tmp/repo${location:+/$location}/src"
+  if [[ ! -f "$src/parser.c" ]]; then
+    echo "  ✗ $lang (no parser.c at ${src#$tmp/})" >&2
+    return 1
+  fi
+
+  # Detect scanner extension. C++ scanner => use clang++.
+  local scanner="" is_cxx=0
+  if   [[ -f "$src/scanner.cc"  ]]; then scanner="$src/scanner.cc";  is_cxx=1
+  elif [[ -f "$src/scanner.cpp" ]]; then scanner="$src/scanner.cpp"; is_cxx=1
+  elif [[ -f "$src/scanner.c"   ]]; then scanner="$src/scanner.c"
+  fi
+
+  local -a cmd
+  if [[ $is_cxx -eq 1 ]]; then
+    cmd=( arch -arm64 /usr/bin/clang++ -arch x86_64 -std=c++14 -fno-exceptions -fno-rtti )
+  else
+    cmd=( arch -arm64 /usr/bin/clang   -arch x86_64 -std=c11 )
+  fi
+  cmd+=( -O2 -fPIC -shared -I "$src" "$src/parser.c" )
+  [[ -n "$scanner" ]] && cmd+=( "$scanner" )
+  cmd+=( -o "$so" )
+
+  if ! "${cmd[@]}" 2>/tmp/ts-install-$lang.log; then
+    echo "  ✗ $lang (compile failed; see /tmp/ts-install-$lang.log)" >&2
+    return 1
+  fi
+
+  if [[ -d "$QUERIES_SRC/$lang" ]]; then
+    mkdir -p "$SITE/queries/$lang"
+    cp "$QUERIES_SRC/$lang"/*.scm "$SITE/queries/$lang/" 2>/dev/null || true
+  else
+    echo "  ! $lang (no queries in plugin; parser installed but highlighting won't work)" >&2
+  fi
+
+  echo "  ✔ $lang"
+}
+
+fails=0
+for lang in "${LANGS[@]}"; do
+  build_one "$lang" || fails=$((fails+1))
+done
+
+if (( fails > 0 )); then
+  echo "$fails parser(s) failed" >&2
+  exit 1
+fi
