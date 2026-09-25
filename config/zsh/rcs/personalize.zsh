@@ -175,4 +175,4 @@ alias uv-env="source .venv/bin/activate"
 alias uv-ipython="uv run --with ipython ipython"
 
 # Q - Querying CSVs
-alias q='q -O -b -H -d ","'
+alias q='q -O -H -d ","'
