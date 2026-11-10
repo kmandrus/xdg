@@ -12,9 +12,19 @@
 zmodload zsh/stat
 
 # Ensure needed XDG Setup is complete
-if [[ -z $XDG_CONFIG_HOME ]]; then
-    print -u2 "goto: XDG_CONFIG_HOME is not set."
-    return 1
+for var in XDG_CONFIG_HOME XDG_STATE_HOME; do
+    if [[ -z ${(P)var} ]]; then
+        print -u2 "goto: $var is not set."
+        return 1
+    fi
+done
+
+# $XDG_STATE_HOME is written to (repo cache), so it has to exist as a directory
+if [[ ! -d $XDG_STATE_HOME ]]; then
+    if ! mkdir -p $XDG_STATE_HOME; then
+        print -u2 "goto: could not create XDG_STATE_HOME ($XDG_STATE_HOME)."
+        return 1
+    fi
 fi
 
 
@@ -26,11 +36,18 @@ fi
 # SHORTCUTS is an user-defined shortcuts file
 if ! [[ -n $SHORTCUTS ]]; then
     SHORTCUTS=$XDG_CONFIG_HOME/goto_shortcuts
-    if ! [[ $SHORTCUTS ]]; then
+    # seed the default shortcuts file if it isn't there yet. it's gitignored,
+    # so a fresh checkout won't have one.
+    if ! [[ -f $SHORTCUTS ]]; then
         echo "home $HOME" > $SHORTCUTS
     fi
 fi
 REPO_CACHE=$XDG_STATE_HOME/goto_cache
+# the cache is built by cache_repos at the end of goto, so on the very first
+# run it doesn't exist yet
+if ! [[ -f $REPO_CACHE ]]; then
+    touch $REPO_CACHE
+fi
 
 
 cache_repos() {
@@ -60,6 +77,11 @@ goto() {
     declare -A paths_by_name
     for file in "$all_search_files[@]"
     do
+        # don't let a missing or unreadable file abort the redirect below.
+        # $SHORTCUTS may be user-supplied and point anywhere.
+        if [[ ! -r $file ]]; then
+            continue
+        fi
         while read -r line
         do
             split=(${(@s[ ])line})
