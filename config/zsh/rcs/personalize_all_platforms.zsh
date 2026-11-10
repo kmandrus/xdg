@@ -1,7 +1,7 @@
 # XDG SETUP VERIFICATION
 for var in XDG_CONFIG_HOME XDG_DATA_HOME XDG_STATE_HOME; do
     if [[ -z ${(P)var} ]]; then
-        print -u2 "personalize.zsh: $var is not set."
+        print -u2 "personalize_all_platforms.zsh: $var is not set."
         print -u2 "XDG_CONFIG_HOME, XDG_DATA_HOME, and XDG_STATE_HOME must all be"
         print -u2 "set for personalization to complete."
         return 1
@@ -11,7 +11,7 @@ done
 # SCRIPT SETUP VERIFICATION
 ZSH_CONFIG_DIR=$XDG_CONFIG_HOME/zsh
 if [[ ! -d $ZSH_CONFIG_DIR ]]; then
-   print -u2 "personalize.zsh: ZSH_CONFIG_DIR ($ZSH_CONFIG_DIR) does not exist."
+   print -u2 "personalize_all_platforms.zsh: ZSH_CONFIG_DIR ($ZSH_CONFIG_DIR) does not exist."
    print -u2 "Ensure XDG_CONFIG_HOME is set appropriately, and that the zsh"
    print -u2 "directory from this repo is symlinked to \$XDG_CONFIG_HOME/zsh."
    return 1
@@ -156,19 +156,14 @@ gn() {
 alias nv="nvim"
 alias nvl="nvim -l"
 alias grep="grep -i -E --color=auto"
-alias ls="ls -G"
 alias sed="sed -E"
 alias python="python3"
-alias caffeinate="caffeinate -isd"
 
 # EDITOR
 export EDITOR=nvim
 
 # Poetry
 alias penv='eval $(poetry env activate)' # activate poetry v2 virtual env
-
-# setput the zsh-syntax-highlighting plugin
-source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # uv
 alias uv-env="source .venv/bin/activate"
