@@ -22,5 +22,3 @@ source $ZSH_RCS/personalize_osx.zsh
 ```
 
 On Linux, source `personalize_linux.zsh` in place of `personalize_osx.zsh`.
-
-Both `personalize_osx.zsh` and `personalize_linux.zsh`.
