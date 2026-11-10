@@ -5,7 +5,12 @@ return {
       {'nvim-lua/plenary.nvim'},
       {'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     },
-    build = "brew install ripgrep",
+    -- NOTE: telescope's live_grep/grep_string need ripgrep on $PATH. It is
+    -- installed by the platform layer, not here -- fh-apt-install on Coder
+    -- (.personalize.background in the dotfiles repo) and brew on macOS
+    -- (zsh/dev_setup/osx_packages.zsh). This used to be a
+    -- `build = "brew install ripgrep"` step, which failed on every install
+    -- under Linux, where there is no brew.
     config = function()
       local t = require("telescope.builtin")
       local opts = { silent = true, noremap = true }

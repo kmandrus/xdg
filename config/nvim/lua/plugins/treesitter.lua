@@ -1,27 +1,25 @@
-  return {
-    {
-      "nvim-treesitter/nvim-treesitter",
-      lazy = false,
-      branch = "main",
-      -- The :TSUpdate build and require('nvim-treesitter').install below are
-      -- disabled: CommandLineTools 27 ships libxcrun.dylib as arm64-only,
-      -- which breaks tree-sitter-cli's build path for our x86_64-Rosetta nvim.
-      -- Parsers and queries under ~/.local/share/nvim/site/ are managed by
-      -- the `ts-install` shell script (config/zsh/scripts/ts-install in this
-      -- repo). Re-enable the block below once we're off Rosetta.
-      -- build = ":TSUpdate",
-      -- config = function()
-      --   local ts = require("nvim-treesitter")
-      --   ts.setup()
-      --   ts.install({
-      --     "bash", "c", "cpp", "css", "diff", "dockerfile",
-      --     "git_config", "git_rebase", "gitattributes", "gitcommit", "gitignore",
-      --     "go", "html", "javascript", "json", "lua", "luadoc", "luap",
-      --     "make", "markdown", "markdown_inline",
-      --     "python", "query", "regex", "rst", "ruby", "rust",
-      --     "sql", "terraform", "toml", "tsx", "typescript",
-      --     "vim", "vimdoc", "yaml",
-      --   })
-      -- end,
-    },
-  }
+-- Parser installation differs by platform.
+--
+-- macOS: handled by the `ts-install` script in this repo
+-- (config/zsh/scripts/ts-install). CommandLineTools 27 ships libxcrun.dylib
+-- as arm64-only, which breaks tree-sitter-cli's build path for our
+-- x86_64-Rosetta nvim. Drop the branch below once we're off Rosetta.
+--
+-- Linux (Coder): that bug doesn't apply, so use nvim-treesitter's own
+-- installer. The parser list lives in kman.tools and is installed up front by
+-- the dotfiles repo's .personalize.background, or on demand via
+-- :KmanInstallParsers -- not on every startup.
+local is_mac = vim.fn.has("mac") == 1
+
+return {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    lazy = false,
+    branch = "main",
+    -- :TSUpdate needs the tree-sitter CLI, which mason provides on Linux only.
+    build = (not is_mac) and ":TSUpdate" or nil,
+    config = function()
+      require("nvim-treesitter").setup()
+    end,
+  },
+}
